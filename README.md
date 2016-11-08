@@ -56,7 +56,7 @@ function fs:copy(source, dest) -- copy file
 
 fs:openDialog(gspot, label, filter)
 
-fs:closeDialog(gspot)
+fs:closeDialog()
 
 On close with OK, the path of the chosen file is at fs.selectedFile
 

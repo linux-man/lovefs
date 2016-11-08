@@ -1,36 +1,5 @@
-function filesystem:openDialog(gspot, label, filter)
-	if self.dialog then
-		self:closeDialog(self.dialog.Gspot)
-	end
-	label = label or 'Load File'
-	self.filter = filter
-	self:cd()
-	self.dialog = gspot:group(label, {love.graphics.getWidth( )/2 - 200, love.graphics.getHeight()/2 - 200, 400, 400})
-	self.dialog.drag = true
-	self:updDialog(gspot)
-	local button = gspot:button('X', {self.dialog.pos.w - gspot.style.unit, 0}, self.dialog)
-	button.click = function(this)
-		self:closeDialog(gspot)
-	end
-	local button = gspot:button('up', {self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, self.dialog)
-	button.click = function(this)
-		local scroll = self.dScrollGroup.scrollv
-		scroll.values.current = math.max(scroll.values.min, scroll.values.current - scroll.values.step)
-	end
-	local button = gspot:button('dn', {self.dialog.pos.w - gspot.style.unit, self.dialog.pos.h - gspot.style.unit * 2}, self.dialog)
-	button.click = function(this)
-		local scroll = self.dScrollGroup.scrollv
-		scroll.values.current = math.min(scroll.values.max, scroll.values.current + scroll.values.step)
-	end
-end
-
-function filesystem:closeDialog(gspot)
-	self.filter = nil
-	gspot:rem(self.dialog)
-	self.dialog = nil
-end
-
-function filesystem:updDialog(gspot)
+local function updDialog(self)
+	local gspot = self.dialog.Gspot
 	self.dScrollGroup = gspot:scrollgroup(nil, {0, gspot.style.unit * 2, self.dialog.pos.w - gspot.style.unit, self.dialog.pos.h - gspot.style.unit * 4}, self.dialog, 'vertical')
 	local hid = gspot:hidden('', {0, 0, self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, nil)
 	local img = gspot:text('^', {0, 0, gspot.style.unit, gspot.style.unit}, hid)
@@ -48,7 +17,7 @@ function filesystem:updDialog(gspot)
 			gspot:rem(self.dDir)
 			gspot:rem(self.dFilename)
 			gspot:rem(self.dOk)
-			self:updDialog(gspot)
+			updDialog(self)
 		end
 		self.dScrollGroup:addchild(hid, 'vertical')
 
@@ -69,7 +38,7 @@ function filesystem:updDialog(gspot)
 			gspot:rem(self.dDir)
 			gspot:rem(self.dFilename)
 			gspot:rem(self.dOk)
-			self:updDialog(gspot)
+			updDialog(self)
 		end
 		self.dScrollGroup:addchild(hid, 'vertical')
 	end
@@ -93,16 +62,48 @@ function filesystem:updDialog(gspot)
 	self.dFilename.done = function(this)
 		if not (this.value == '') then
 			self.selectedFile = self:absPath(this.value)
-			self:closeDialog(gspot)
+			self:closeDialog()
 		end
 	end
 	self.dOk = gspot:button('OK', {self.dialog.pos.w - gspot.style.unit * 4, self.dialog.pos.h - gspot.style.unit, gspot.style.unit * 4, gspot.style.unit}, self.dialog)
 	self.dOk.click = function(this, x, y, button)
 		if not (self.dFilename.value == '') then
 			self.selectedFile = self:absPath(self.dFilename.value)
-			self:closeDialog(gspot)
+			self:closeDialog()
 		end
 	end
 	self.dDir.label = self.current
 	self.dFilename.value = ''
+end
+
+function filesystem:openDialog(gspot, label, filter)
+	if self.dialog then
+		self:closeDialog()
+	end
+	label = label or 'Load File'
+	self.filter = filter
+	self:cd()
+	self.dialog = gspot:group(label, {love.graphics.getWidth( )/2 - 200, love.graphics.getHeight()/2 - 200, 400, 400})
+	self.dialog.drag = true
+	updDialog(self)
+	local button = gspot:button('X', {self.dialog.pos.w - gspot.style.unit, 0}, self.dialog)
+	button.click = function(this)
+		self:closeDialog()
+	end
+	local button = gspot:button('up', {self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, self.dialog)
+	button.click = function(this)
+		local scroll = self.dScrollGroup.scrollv
+		scroll.values.current = math.max(scroll.values.min, scroll.values.current - scroll.values.step)
+	end
+	local button = gspot:button('dn', {self.dialog.pos.w - gspot.style.unit, self.dialog.pos.h - gspot.style.unit * 2}, self.dialog)
+	button.click = function(this)
+		local scroll = self.dScrollGroup.scrollv
+		scroll.values.current = math.min(scroll.values.max, scroll.values.current + scroll.values.step)
+	end
+end
+
+function filesystem:closeDialog()
+	self.filter = nil
+	self.dialog.Gspot:rem(self.dialog)
+	self.dialog = nil
 end
