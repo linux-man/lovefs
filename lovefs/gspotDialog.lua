@@ -1,4 +1,7 @@
 function filesystem:openDialog(gspot, label, filter)
+	if self.dialog then
+		self:closeDialog(self.dialog.Gspot)
+	end
 	label = label or 'Load File'
 	self.filter = filter
 	self:cd()
