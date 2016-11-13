@@ -1,4 +1,3 @@
-package.path = package.path .. ';../?.lua'
 gui = require('Gspot/Gspot')
 require('lovefs/lovefs')
 require('lovefs/gspotDialog')

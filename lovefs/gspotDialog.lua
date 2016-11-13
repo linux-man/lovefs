@@ -1,9 +1,28 @@
+--[[------------------------------------
+LoveFS Gspot Dialogs v1.1
+Pure Lua FileSystem Access - Loveframes interface
+Under the MIT license.
+copyright(c) 2016 Caldas Lopes aka linux-man
+--]]------------------------------------
+
+local path = string.sub(..., 1, string.len(...) - string.len('gspotDialog'))..'images/'
+local folderImg = love.graphics.newImage(path..'folder.png')
+local fileImg = love.graphics.newImage(path..'file.png')
+local upImg = love.graphics.newImage(path..'up.png')
+
+
+local function closeDialog(self)
+	self.filter = nil
+	self.dialog.Gspot:rem(self.dialog)
+	self.dialog = nil
+end
+
 local function updDialog(self)
 	local gspot = self.dialog.Gspot
 	self.dScrollGroup = gspot:scrollgroup(nil, {0, gspot.style.unit * 2, self.dialog.pos.w - gspot.style.unit, self.dialog.pos.h - gspot.style.unit * 4}, self.dialog, 'vertical')
 	local hid = gspot:hidden('', {0, 0, self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, nil)
-	local img = gspot:text('^', {0, 0, gspot.style.unit, gspot.style.unit}, hid)
-	local btn = gspot:text('Up', {gspot.style.unit, 0, self.dialog.pos.w - gspot.style.unit * 2, gspot.style.unit}, hid)
+	local img = gspot:image('', {0, 0, gspot.style.unit, gspot.style.unit}, hid, upImg)
+	local btn = gspot:text('..', {gspot.style.unit, 0, self.dialog.pos.w - gspot.style.unit * 2, gspot.style.unit}, hid)
 		btn.style.fg = {200, 200, 200, 255}
 		btn.enter = function(this)
 			btn.style.fg = {255, 255, 255, 255}
@@ -23,7 +42,7 @@ local function updDialog(self)
 
 	for _, v in ipairs(fs.dirs) do
 		local hid = gspot:hidden('', {0, 0, self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, nil)
-		local img = gspot:text(self.sep, {0, 0, gspot.style.unit, gspot.style.unit}, hid)
+		local img = gspot:image('', {0, 0, gspot.style.unit, gspot.style.unit}, hid, folderImg)
 		local btn = gspot:text(v, {gspot.style.unit, 0, self.dialog.pos.w - gspot.style.unit * 2, gspot.style.unit}, hid)
 		btn.style.fg = {200, 200, 200, 255}
 		btn.enter = function(this)
@@ -44,6 +63,7 @@ local function updDialog(self)
 	end
 	for _, v in ipairs(fs.files) do
 		local hid = gspot:hidden('', {0, 0, self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, nil)
+		local img = gspot:image('', {0, 0, gspot.style.unit, gspot.style.unit}, hid, fileImg)
 		local btn = gspot:text(v, {gspot.style.unit, 0, self.dialog.pos.w - gspot.style.unit * 2, gspot.style.unit}, hid)
 		btn.style.fg = {200, 200, 200, 255}
 		btn.enter = function(this)
@@ -62,14 +82,14 @@ local function updDialog(self)
 	self.dFilename.done = function(this)
 		if not (this.value == '') then
 			self.selectedFile = self:absPath(this.value)
-			self:closeDialog()
+			closeDialog(self)
 		end
 	end
 	self.dOk = gspot:button('OK', {self.dialog.pos.w - gspot.style.unit * 4, self.dialog.pos.h - gspot.style.unit, gspot.style.unit * 4, gspot.style.unit}, self.dialog)
 	self.dOk.click = function(this, x, y, button)
 		if not (self.dFilename.value == '') then
 			self.selectedFile = self:absPath(self.dFilename.value)
-			self:closeDialog()
+			closeDialog(self)
 		end
 	end
 	self.dDir.label = self.current
@@ -78,7 +98,7 @@ end
 
 function filesystem:openDialog(gspot, label, filter)
 	if self.dialog then
-		self:closeDialog()
+		closeDialog(self)
 	end
 	label = label or 'Load File'
 	self.filter = filter
@@ -88,7 +108,7 @@ function filesystem:openDialog(gspot, label, filter)
 	updDialog(self)
 	local button = gspot:button('X', {self.dialog.pos.w - gspot.style.unit, 0}, self.dialog)
 	button.click = function(this)
-		self:closeDialog()
+		closeDialog(self)
 	end
 	local button = gspot:button('up', {self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, self.dialog)
 	button.click = function(this)
@@ -100,10 +120,4 @@ function filesystem:openDialog(gspot, label, filter)
 		local scroll = self.dScrollGroup.scrollv
 		scroll.values.current = math.min(scroll.values.max, scroll.values.current + scroll.values.step)
 	end
-end
-
-function filesystem:closeDialog()
-	self.filter = nil
-	self.dialog.Gspot:rem(self.dialog)
-	self.dialog = nil
 end

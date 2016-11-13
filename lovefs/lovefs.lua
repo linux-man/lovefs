@@ -1,5 +1,5 @@
 --[[------------------------------------
-LoveFS v1.0
+LoveFS v1.1
 Pure Lua FileSystem Access
 Under the MIT license.
 copyright(c) 2016 Caldas Lopes aka linux-man
@@ -81,7 +81,11 @@ end
 
 local function removeValue(tb, value)
 	for n = #tb, 1, -1 do
-		if tb[n] == value then table.remove(tb, n) end
+		if value == 'hidden' then
+			if tb[n]:match('^%..') then table.remove(tb, n) end
+		else
+			if tb[n] == value then table.remove(tb, n) end
+		end
 	end
 end
 
@@ -103,6 +107,27 @@ function filesystem:absPath(path)
 	return path
 end
 
+function filesystem:switchHidden()
+	self.showHidden = not self.showHidden
+	self:cd()
+end
+
+function filesystem:setFilter(filter)
+	self.filter = nil
+	if type(filter) == "table" then
+		self.filter = filter
+	elseif type(filter) == "string" then
+		local t = {}
+		f = filter:sub((filter:find('|') or 0) + 1)
+		for i in string.gmatch(f, "%S+") do
+			i = i:gsub('[%*%.%;]', '')
+			if i ~= '' then table.insert(t, i) end
+		end
+		if #t > 0 then self.filter = t end
+	end
+	self:cd()
+end
+
 function filesystem:ls(dir) 
 	dir = dir or self.current
 	dir = self:absPath(dir)
@@ -115,7 +140,7 @@ function filesystem:ls(dir)
 		if hFile ~= INVALID_HANDLE then
 			repeat
 				local fn = w2u(fd.cFileName)
-				if fd.dwFileWttributes == 16 or fd.dwFileWttributes == 17 or fd.dwFileWttributes == 8210 then
+				if fd.dwFileWttributes == 16 or fd.dwFileWttributes == 17 or (self.showHidden and fd.dwFileWttributes == 8210) then
 					table.insert(tDirs, fn)
 				elseif fd.dwFileWttributes == 32 then
 					table.insert(tFiles, fn)
@@ -143,6 +168,7 @@ function filesystem:ls(dir)
 	if #tDirs == 0 then return false end
 	removeValue(tDirs, '.')
 	removeValue(tDirs, '..')
+	if not (self.win or self.showHidden) then removeValue(tDirs, 'hidden') end
 	table.sort(tDirs)
 	if self.filter then
 		for n = #tFiles, 1, -1 do
@@ -154,6 +180,7 @@ function filesystem:ls(dir)
 			if not (valid) then table.remove(tFiles, n) end
 		end
 	end
+	if not self.showHidden then removeValue(tFiles, 'hidden') end
 	table.sort(tFiles)
 	
 	return dir, tDirs, tFiles, join(tDirs, tFiles)
@@ -203,13 +230,13 @@ function filesystem:isFile(path)
 	else return false end
 end
 
-function filesystem:updateDrives()
+function filesystem:updDrives()
 	drives = {}
 	if self.win then
 		aCode = string.byte('A')
 		drv = ffi.C.GetLogicalDrives()
 		for n = 0, 15, 1 do
-			if not(drv % 2) then table.insert(drives, string.char(aCode + n)..':\\') end
+			if not(drv % 2 == 0) then table.insert(drives, string.char(aCode + n)..':\\') end
 			drv = math.floor(drv / 2)
 		end
 	elseif ffi.os == 'Linux' then
@@ -295,6 +322,7 @@ function lovefs(dir)
 	temp.win = ffi.os == "Windows"
 	temp.selectedFile = nil
 	temp.filter = nil
+	temp.showHidden = false 
 	temp.home = love.filesystem.getUserDirectory()
 	temp.current = temp.home
 	temp.sep = package.config:sub(1,1)
@@ -305,6 +333,6 @@ function lovefs(dir)
 			else temp:cd(sep) end
 		end
 	end
-	temp:updateDrives()
+	temp:updDrives()
 	return temp
 end

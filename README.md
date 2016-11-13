@@ -22,6 +22,8 @@ fs.home -- user directory [string]
 
 fs.filter -- [table] with extensions, like {'jpg', 'png'}. Used by fs:ls to filter files. Don't forget to NIL!
 
+fs.showHidden -- Show or hide hidden files and directories. Default: FALSE
+
 function fs:updDrives() -- update drives list
 
 The next functions accept absolute and relative (to current) paths
@@ -38,7 +40,11 @@ function fs:cd(dir) -- Change directory. Populate fs.dirs and fs.files and fs.al
 
 function fs:up() -- move to parent directory (using cd())
 
-function fs:absPath(path) -- create absolute paths
+function fs:setFilter(filter [nil, table or string]) -- sets fs.filter and calls fs:cd(). String can be 'File type | *.ext1 *.ext2'
+
+function fs:switchHidden() -- switch fs.showHidden
+
+function fs:absPath(path) -- return absolute paths
 
 function fs:loadImage(source) -- return image
 
@@ -56,7 +62,13 @@ function fs:copy(source, dest) -- copy file
 
 fs:openDialog(gspot, label, filter)
 
-fs:closeDialog()
+On close with OK, the path of the chosen file is at fs.selectedFile
+
+---------------------------------------- loveframesDialog.lua ------------------------------------------------
+
+fs:loadDialog(LoveFrames, label, filters)
+
+fs:saveDialog(LoveFrames, label)
 
 On close with OK, the path of the chosen file is at fs.selectedFile
 
