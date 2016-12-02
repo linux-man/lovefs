@@ -1,5 +1,5 @@
 --[[------------------------------------
-LoveFS LoveFrames Dialogs v1.0
+LoveFS LoveFrames Dialogs v1.1
 Pure Lua FileSystem Access - Loveframes interface
 Under the MIT license.
 copyright(c) 2016 Caldas Lopes aka linux-man
@@ -9,10 +9,13 @@ local path = string.sub(..., 1, string.len(...) - string.len('loveframesDialog')
 local folderImg = love.graphics.newImage(path..'folder.png')
 local fileImg = love.graphics.newImage(path..'file.png')
 local upImg = love.graphics.newImage(path..'up.png')
+local dDir
+local list
+local fileinput
 
 local function updDialog(self, lf)
-	self.dDir:SetText(self.current)
-	self.list:Clear()
+	dDir:SetText(self.current)
+	list:Clear()
 	local i = lf.Create('button')
 	i:SetSize(405, 25)
 	i.image = upImg
@@ -23,7 +26,7 @@ local function updDialog(self, lf)
 		self:up()
 		updDialog(self, lf)
 	end
-	self.list:AddItem(i)
+	list:AddItem(i)
 	for _, d in ipairs(self.dirs) do
 		local i = lf.Create('button')
 		i:SetSize(405, 25)
@@ -32,11 +35,11 @@ local function updDialog(self, lf)
 		i.groupIndex = 1
 		i.OnClick = function(object)
 			self.dialog.selectedFile = nil
-			if self.fileinput then self.fileinput.text ='' end
+			if fileinput then fileinput.text ='' end
 			self:cd(object:GetText())
 			updDialog(self, lf)
 		end
-		self.list:AddItem(i)
+		list:AddItem(i)
 	end
 	for _, f in ipairs(self.files) do
 		local i = lf.Create('button')
@@ -46,12 +49,20 @@ local function updDialog(self, lf)
 		i.groupIndex = 1
 		i.OnClick = function(object)
 			if self:isFile(object:GetText()) then
-				self.dialog.selectedFile = object:GetText()
-				if self.fileinput then self.fileinput.text = object:GetText() end
+				self.dialog.selectedFile = object:GetText() print(fileinput)
+				if fileinput then fileinput:SetText(object:GetText()) end
 			end
 		end
-		self.list:AddItem(i)
+		list:AddItem(i)
 	end	
+end
+
+local function close(self)
+	self.dialog:Remove()
+	self.dialog = nil
+	dDir = nil
+	list = nil
+	fileinput = nil
 end
 
 local function init(self, lf, label)
@@ -60,6 +71,9 @@ local function init(self, lf, label)
 	self.dialog:SetSize(415, 395)
 	self.dialog:Center()
 	self.dialog:SetModal(true)
+	self.dialog.OnClose = function(object)
+		close(self)
+	end
 
 	local drives = lf.Create('multichoice', self.dialog)
 	local tooltip = lf.Create('tooltip')
@@ -81,34 +95,33 @@ local function init(self, lf, label)
 	for _, drive in ipairs(self.drives) do
 		drives:AddChoice(drive)
 	end
-	drives:SetChoice(self.drives[1])
+	drives.text = 'Change Drive'
 	
-	self.dDir = lf.Create('button', self.dialog)	
+	dDir = lf.Create('button', self.dialog)	
 	local tooltip = lf.Create('tooltip')
-	tooltip:SetObject(self.dDir)
+	tooltip:SetObject(dDir)
 	tooltip:SetPadding(5)
 	tooltip:SetOffsets(5, -5)
 	tooltip:SetText('Current Directory')
-	self.dDir:SetPos(100+10, 25+5)
-	self.dDir:SetSize(300, 25)
-	self.dDir.image = folderImg
-	self.dDir.checked = true
-	self.dDir.enabled = false
+	dDir:SetPos(100+10, 25+5)
+	dDir:SetSize(300, 25)
+	dDir.image = folderImg
+	dDir.checked = true
+	dDir.enabled = false
 
-	self.list = lf.Create('list', self.dialog)
-	self.list:SetPos(5, 60)
-	self.list:SetSize(405, 300)
-	self.list:SetDisplayType('vertical')
-	self.list:SetPadding(0)
-	self.list:SetSpacing(0)
+	list = lf.Create('list', self.dialog)
+	list:SetPos(5, 60)
+	list:SetSize(405, 300)
+	list:SetDisplayType('vertical')
+	list:SetPadding(0)
+	list:SetSpacing(0)
 
 	local cancel = lf.Create('button', self.dialog)
 	cancel:SetPos(410-75-80, 360+5)
 	cancel:SetSize(75, 25)
 	cancel:SetText('Cancel')
 	cancel.OnClick = function(object)
-		self.dialog:Remove()
-		self.dialog = nil
+		close(self)
 	end
 	local ok = lf.Create('button', self.dialog)
 	ok:SetPos(410-75, 360+5)
@@ -117,8 +130,7 @@ local function init(self, lf, label)
 	ok.OnClick = function(object)
 		if self.dialog.selectedFile then
 			self.selectedFile = self.dialog.selectedFile
-			self.dialog:Remove()
-			self = nil
+			close(self)
 		end
 	end
 end
@@ -163,15 +175,15 @@ function filesystem:saveDialog(lf, label)
 	self:cd()
 	init(self, lf, label)
 
-	self.fileinput = lf.Create('textinput', self.dialog)
+	fileinput = lf.Create('textinput', self.dialog)
 	local tooltip = lf.Create('tooltip')
-	tooltip:SetObject(self.fileinput)
+	tooltip:SetObject(fileinput)
 	tooltip:SetPadding(5)
 	tooltip:SetOffsets(5, -5)
 	tooltip:SetText('Filename')
-	self.fileinput:SetPos(5, 360+5)
-	self.fileinput:SetSize(245, 25)
-	self.fileinput.OnTextChanged = function(object, text)
+	fileinput:SetPos(5, 360+5)
+	fileinput:SetSize(245, 25)
+	fileinput.OnTextChanged = function(object, text)
 		self.dialog.selectedFile = object:GetText()
 	end
 	updDialog(self, lf)
