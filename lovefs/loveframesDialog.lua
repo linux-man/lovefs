@@ -57,7 +57,7 @@ local function updDialog(self, lf)
 	end	
 end
 
-local function close(self)
+local function closeDialog(self)
 	self.dialog:Remove()
 	self.dialog = nil
 	dDir = nil
@@ -72,7 +72,7 @@ local function init(self, lf, label)
 	self.dialog:Center()
 	self.dialog:SetModal(true)
 	self.dialog.OnClose = function(object)
-		close(self)
+		closeDialog(self)
 	end
 
 	local drives = lf.Create('multichoice', self.dialog)
@@ -121,7 +121,7 @@ local function init(self, lf, label)
 	cancel:SetSize(75, 25)
 	cancel:SetText('Cancel')
 	cancel.OnClick = function(object)
-		close(self)
+		closeDialog(self)
 	end
 	local ok = lf.Create('button', self.dialog)
 	ok:SetPos(410-75, 360+5)
@@ -130,7 +130,7 @@ local function init(self, lf, label)
 	ok.OnClick = function(object)
 		if self.dialog.selectedFile then
 			self.selectedFile = self.dialog.selectedFile
-			close(self)
+			closeDialog(self)
 		end
 	end
 end
