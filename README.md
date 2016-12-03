@@ -64,7 +64,7 @@ fs:loadDialog(gui, label, filters)
 
 fs:saveDialog(gui, label)
 
-filters example: {'All | *.*', 'Image | *.jpg *.png *.bmp', 'Sound | *.mp3 *.wav'}
+filters example: {'All | \*.\*', 'Image | *.jpg *.png *.bmp', 'Sound | *.mp3 *.wav'}
 
 On close with OK, the path of the chosen file is at fs.selectedFile
 
