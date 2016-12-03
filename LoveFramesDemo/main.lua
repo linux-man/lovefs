@@ -19,7 +19,7 @@ function love.load()
 	btlsnd:SetSize(200, 40)
 	btlsnd:SetText('Load Sound')
 	btlsnd.OnClick = function(object)
-		fsload:loadDialog(loveframes, nil, {'All | *.*', 'Sound | *.mp3 *.wav'})
+		fsload:loadDialog(loveframes, nil, {'Sound | *.mp3 *.wav', 'All | *.*'})
 	end
 
 	btlttf = loveframes.Create('button', window)
@@ -27,7 +27,7 @@ function love.load()
 	btlttf:SetSize(200, 40)
 	btlttf:SetText('Load TrueType')
 	btlttf.OnClick = function(object)
-		fsload:loadDialog(loveframes, nil, {'All | *.*', 'TrueType | *.ttf'})
+		fsload:loadDialog(loveframes, nil, {'TrueType | *.ttf', 'All | *.*'})
 	end
 
 	btsave = loveframes.Create('button', window)	

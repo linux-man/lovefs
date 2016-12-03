@@ -58,17 +58,13 @@ This function only accept absolute paths
 
 function fs:copy(source, dest) -- copy file
 
----------------------------------------- gspotDialog.lua ------------------------------------------------
+---------------------------------------- gspotDialog.lua and loveframesDialog.lua ------------------------------------------------
 
-fs:openDialog(gspot, label, filter)
+fs:loadDialog(gui, label, filters)
 
-On close with OK, the path of the chosen file is at fs.selectedFile
+fs:saveDialog(gui, label)
 
----------------------------------------- loveframesDialog.lua ------------------------------------------------
-
-fs:loadDialog(LoveFrames, label, filters)
-
-fs:saveDialog(LoveFrames, label)
+filters example: {'All | *.*', 'Image | *.jpg *.png *.bmp', 'Sound | *.mp3 *.wav'}
 
 On close with OK, the path of the chosen file is at fs.selectedFile
 

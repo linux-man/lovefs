@@ -7,20 +7,20 @@ love.load = function()
 	fs = lovefs()
 	local button = gui:button('Load Image', {0, 0, 200, 40})
 	button.click = function(this)
-		fs:openDialog(gui, 'Load Image', {'jpg', 'png', 'bmp'})
+		fs:loadDialog(gui, 'Load Image', {'All | *.*', 'Jpeg | *.jpg *.jpeg', 'Png | *.png', 'Bmp | *.bmp', 'Gif | *.gif'})
 	end
 	local button = gui:button('Load Sound', {200, 0, 200, 40})
 	button.click = function(this)
-		fs:openDialog(gui, 'Load Sound', {'mp3', 'wav'})
+		fs:loadDialog(gui, 'Load Sound', {'Sound | *.mp3 *.wav', 'All | *.*'})
 	end
 	local button = gui:button('Load TrueType', {400, 0, 200, 40})
 	button.click = function(this)
-		fs:openDialog(gui, 'Load TrueType', {'ttf'})
+		fs:loadDialog(gui, 'Load TrueType', {'TrueType | *.ttf', 'All | *.*'})
 	end
 	saveButton = gui:button('Save Image (as png)', {600, 0, 200, 40})
 	saveButton.click = function(this)
 		save = true
-		fs:openDialog(gui, 'Save Image')
+		fs:saveDialog(gui, 'Save Image')
 	end
 	saveButton:hide()
 end

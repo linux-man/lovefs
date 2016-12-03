@@ -49,7 +49,7 @@ local function updDialog(self, lf)
 		i.groupIndex = 1
 		i.OnClick = function(object)
 			if self:isFile(object:GetText()) then
-				self.dialog.selectedFile = object:GetText() print(fileinput)
+				self.dialog.selectedFile = object:GetText()
 				if fileinput then fileinput:SetText(object:GetText()) end
 			end
 		end
@@ -63,6 +63,7 @@ local function closeDialog(self)
 	dDir = nil
 	list = nil
 	fileinput = nil
+	self.filter = nil
 end
 
 local function init(self, lf, label)
@@ -139,8 +140,6 @@ function filesystem:loadDialog(lf, label, filters)
 	label = label or 'Load File'
 	self:cd() 
 	init(self, lf, label)
-	local tb_filters = {}
-	if filters then for _,v in ipairs(filters) do table.insert(tb_filters, v) end end
 
 	local filter = lf.Create('multichoice', self.dialog)
 	local tooltip = lf.Create('tooltip')
@@ -159,8 +158,8 @@ function filesystem:loadDialog(lf, label, filters)
 	end	
 	if filters and type(filters) == "table" then
 		for _, f in ipairs(filters) do filter:AddChoice(f) end
-		filter:SetChoice(tb_filters[1])
-		self:setFilter(tb_filters[1])
+		filter:SetChoice(filters[1])
+		self:setFilter(filters[1])
 	else
 		filter:SetChoice('*.*')
 		self:setFilter(nil)
@@ -171,7 +170,7 @@ end
 
 function filesystem:saveDialog(lf, label)
 	self.filter = nil
-	label = label or 'Load File'
+	label = label or 'Save File'
 	self:cd()
 	init(self, lf, label)
 
