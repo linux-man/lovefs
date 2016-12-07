@@ -16,6 +16,16 @@ local dOK
 local drives
 local filter
 
+local function closeColGroup(colGroup)
+	if colGroup then
+		for _, opt in ipairs(colGroup.children) do
+			if not (opt.label == '=' or opt.label == '-') then opt:hide() end
+		end
+		colGroup.view = false
+		colGroup.control.label = '='
+	end
+end
+
 local function closeDialog(self)
 	self.filter = nil
 	self.dialog.Gspot:rem(self.dialog)
@@ -31,13 +41,34 @@ end
 local function updDialog(self)
 	local gspot = self.dialog.Gspot
 	if dScrollGroup then gspot:rem(dScrollGroup) end
-	dScrollGroup = gspot:scrollgroup(nil, {0, gspot.style.unit * 3, self.dialog.pos.w - gspot.style.unit, self.dialog.pos.h - gspot.style.unit * 5}, self.dialog, 'vertical')
+	if drives then gspot:rem(drives) end
+	dScrollGroup = gspot:scrollgroup(nil, {0, gspot.style.unit * 2, self.dialog.pos.w - gspot.style.unit, self.dialog.pos.h - gspot.style.unit * 4}, self.dialog, 'vertical')
+
+	drives = gspot:collapsegroup('Change Drive', {0, gspot.style.unit, gspot.style.unit * 8, gspot.style.unit}, self.dialog)
+	drives.tip = 'Drives'
+	for i, drive in ipairs(self.drives) do
+		local option = gspot:option(drive, {0, gspot.style.unit * i, drives.pos.w, gspot.style.unit}, drives, i)
+		option:hide()
+		option.click = function(this)
+			this.parent:toggle()
+			this.parent.label = this.label
+			this.parent.value = this.value
+			self:cd(this.label)
+			updDialog(self)
+		end
+	end
+	drives.view = false
+	drives.control.label = '='
+	drives.control.click = function(this) this.parent:toggle() end
+
 	local hid = gspot:hidden('', {0, 0, self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, nil)
 	local img = gspot:image('', {0, 0, gspot.style.unit, gspot.style.unit}, hid, upImg)
 	local btn = gspot:text('..', {gspot.style.unit, 0, self.dialog.pos.w - gspot.style.unit * 2, gspot.style.unit}, hid)
 		btn.style.fg = {200, 200, 200, 255}
 		btn.enter = function(this)
 			btn.style.fg = {255, 255, 255, 255}
+			closeColGroup(drives) 
+			closeColGroup(filter) 
 		end
 		btn.leave = function(this)
 			btn.style.fg = {200, 200, 200, 255}
@@ -55,6 +86,8 @@ local function updDialog(self)
 		btn.style.fg = {200, 200, 200, 255}
 		btn.enter = function(this)
 			btn.style.fg = {255, 255, 255, 255}
+			closeColGroup(drives) 
+			closeColGroup(filter) 
 		end
 		btn.leave = function(this)
 			btn.style.fg = {200, 200, 200, 255}
@@ -72,6 +105,8 @@ local function updDialog(self)
 		btn.style.fg = {200, 200, 200, 255}
 		btn.enter = function(this)
 			btn.style.fg = {255, 255, 255, 255}
+			closeColGroup(drives) 
+			closeColGroup(filter) 
 		end
 		btn.leave = function(this)
 			btn.style.fg = {200, 200, 200, 255}
@@ -89,33 +124,9 @@ local function init(self, gspot, label)
 	self:cd()
 	self.dialog = gspot:group(label, {love.graphics.getWidth( )/2 - 200, love.graphics.getHeight()/2 - 200, 400, 400})
 	self.dialog.drag = true
-	drives = gspot:collapsegroup('Choose Drive', {0, gspot.style.unit, 128, gspot.style.unit}, self.dialog)
-	drives.tip = 'Drives'
-	for i, drive in ipairs(self.drives) do
-		local option = gspot:option(drive, {0, gspot.style.unit * i, drives.pos.w, gspot.style.unit}, drives, i)
-		option:hide()
-		option.click = function(this)
-			this.parent:toggle()
-			this.parent.label = this.label
-			this.parent.value = this.value
-			self:cd(this.label)
-			updDialog(self)
-		end
-	end
-	drives.view = false
-	drives.control.label = '='
-	drives.control.click = function(this)
-		this.parent:setlevel()
-		this.parent:toggle()
-	end
-	drives.enter = function(this) this:setlevel() end
 
-	dDir = gspot:text(self.current, {0, gspot.style.unit * 2, self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, self.dialog)
+	dDir = gspot:text(self.current, {gspot.style.unit * 8, gspot.style.unit, self.dialog.pos.w - gspot.style.unit * 8, gspot.style.unit}, self.dialog)
 	dDir.tip = 'Current Directory'
-	dDir.enter = function(this) this:setlevel() end
-
-	dFilename = gspot:input('Filename', {gspot.style.unit * 4, self.dialog.pos.h - gspot.style.unit, self.dialog.pos.w - gspot.style.unit * 8, gspot.style.unit}, self.dialog)
-	dFilename.enter = function(this) this:setlevel() end
 
 	dOk = gspot:button('OK', {self.dialog.pos.w - gspot.style.unit * 4, self.dialog.pos.h - gspot.style.unit, gspot.style.unit * 4, gspot.style.unit}, self.dialog)
 	dOk.click = function(this, x, y, button)
@@ -124,7 +135,6 @@ local function init(self, gspot, label)
 			closeDialog(self)
 		end
 	end
-	dOk.enter = function(this) this:setlevel() end
 
 	local button = gspot:button('X', {self.dialog.pos.w - gspot.style.unit, 0}, self.dialog)
 	button.click = function(this)
@@ -149,7 +159,7 @@ function filesystem:loadDialog(gspot, label, filters)
 	label = label or 'Load File'
 	init(self, gspot, label)
 	
-	filter =  gspot:collapsegroup('*.*', {128, gspot.style.unit, 196, gspot.style.unit}, self.dialog)
+	filter =  gspot:collapsegroup('*.*', {0, self.dialog.pos.h - gspot.style.unit, gspot.style.unit * 8, gspot.style.unit}, self.dialog)
 	filter.tip = 'Filters'
 	if filters and type(filters) == "table" then
 		for i, f in ipairs(filters) do
@@ -170,11 +180,9 @@ function filesystem:loadDialog(gspot, label, filters)
 	end
 	filter.view = false
 	filter.control.label = '='
-	filter.control.click = function(this)
-		this.parent:setlevel()
-		this.parent:toggle()
-	end
-	filter.enter = function(this) this:setlevel() end
+	filter.control.click = function(this) this.parent:toggle() end
+
+	dFilename = gspot:input(nil, {gspot.style.unit * 8, self.dialog.pos.h - gspot.style.unit, self.dialog.pos.w - gspot.style.unit * 12, gspot.style.unit}, self.dialog)
 
 	dFilename.textinput = function(this, key) end	
 	dFilename.keypress = function(this, key) end	
@@ -189,6 +197,8 @@ function filesystem:saveDialog(gspot, label)
 	label = label or 'Save File'
 	self.filter = nil
 	init(self, gspot, label)
+
+	dFilename = gspot:input('Filename', {gspot.style.unit * 4, self.dialog.pos.h - gspot.style.unit, self.dialog.pos.w - gspot.style.unit * 8, gspot.style.unit}, self.dialog)
 
 	dFilename.done = function(this)
 		if not (this.value == '') then
