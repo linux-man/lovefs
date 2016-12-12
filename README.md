@@ -46,23 +46,23 @@ function fs:switchHidden() -- switch fs.showHidden
 
 function fs:absPath(path) -- return absolute paths
 
-function fs:loadImage(source) -- return image
+function fs:loadImage(source) -- return image. Use fs.selectedFile if no source is given
 
-function fs:loadSource(source) --return sound
+function fs:loadSource(source) --return sound. Use fs.selectedFile if no source is given
 
-function fs:loadFont(size, source) --return font
+function fs:loadFont(size, source) --return font. Use fs.selectedFile if no source is given
 
-function fs:saveImage(img, dest) -- Need Canvas support. Return FALSE on failure
+function fs:saveImage(img, dest) -- Need Canvas support. Return FALSE on failure. Use fs.selectedFile if no source is given
 
 This function only accept absolute paths
 
 function fs:copy(source, dest) -- copy file
 
----------------------------------------- gspotDialog.lua and loveframesDialog.lua ------------------------------------------------
+---------------------------------------- gspotDialog.lua and loveframesDialog.lua and luigiDialog.lua ------------------------------------------------
 
-fs:loadDialog(gui, label, filters)
+fs:loadDialog(gui, label, filters) or fs:loadDialog(gui.Layout, label, filters) for Luigi
 
-fs:saveDialog(gui, label)
+fs:saveDialog(gui, label) or fs:saveDialog(gui.Layout, label) for Luigi
 
 filters example: {'All | \*.\*', 'Image | *.jpg *.png *.bmp', 'Sound | *.mp3 *.wav'}
 
