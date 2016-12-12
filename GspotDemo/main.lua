@@ -3,18 +3,20 @@ require('lovefs/lovefs')
 require('lovefs/gspotDialog')
 
 love.load = function()
-	save = false
 	fs = lovefs()
 	local button = gui:button('Load Image', {0, 0, 200, 40})
 	button.click = function(this)
+		save = false
 		fs:loadDialog(gui, 'Load Image', {'All | *.*', 'Jpeg | *.jpg *.jpeg', 'Png | *.png', 'Bmp | *.bmp', 'Gif | *.gif'})
 	end
 	local button = gui:button('Load Sound', {200, 0, 200, 40})
 	button.click = function(this)
+		save = false
 		fs:loadDialog(gui, 'Load Sound', {'Sound | *.mp3 *.wav', 'All | *.*'})
 	end
 	local button = gui:button('Load TrueType', {400, 0, 200, 40})
 	button.click = function(this)
+		save = false
 		fs:loadDialog(gui, 'Load TrueType', {'TrueType | *.ttf', 'All | *.*'})
 	end
 	saveButton = gui:button('Save Image (as png)', {600, 0, 200, 40})
