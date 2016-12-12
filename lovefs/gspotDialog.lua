@@ -79,7 +79,7 @@ local function updDialog(self)
 		end
 		dScrollGroup:addchild(hid, 'vertical')
 
-	for _, v in ipairs(fs.dirs) do
+	for _, v in ipairs(self.dirs) do
 		local hid = gspot:hidden('', {0, 0, self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, nil)
 		local img = gspot:image('', {0, 0, gspot.style.unit, gspot.style.unit}, hid, folderImg)
 		local btn = gspot:text(v, {gspot.style.unit, 0, self.dialog.pos.w - gspot.style.unit * 2, gspot.style.unit}, hid)
@@ -98,7 +98,7 @@ local function updDialog(self)
 		end
 		dScrollGroup:addchild(hid, 'vertical')
 	end
-	for _, v in ipairs(fs.files) do
+	for _, v in ipairs(self.files) do
 		local hid = gspot:hidden('', {0, 0, self.dialog.pos.w - gspot.style.unit, gspot.style.unit}, nil)
 		local img = gspot:image('', {0, 0, gspot.style.unit, gspot.style.unit}, hid, fileImg)
 		local btn = gspot:text(v, {gspot.style.unit, 0, self.dialog.pos.w - gspot.style.unit * 2, gspot.style.unit}, hid)
