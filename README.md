@@ -1,6 +1,6 @@
 # lovefs
 ## Load and save files outside love.filesystem
-###with ffi
+### with ffi
 
 The ffi code was mostly adapted (with my sincerest gratitude) from
 
