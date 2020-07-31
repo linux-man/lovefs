@@ -1,70 +1,156 @@
 # lovefs
-## Load and save files outside love.filesystem
-### with ffi
+
+Load and save files outside `love.filesystem`.
+
+## with ffi
 
 The ffi code was mostly adapted (with my sincerest gratitude) from
 
-https://github.com/nyfair/fi-luajit (Windows) and https://github.com/Igalia/pflua (Posix).
+* [fi-luajit](https://github.com/nyfair/fi-luajit) (Windows)
+* [pflua](https://github.com/Igalia/pflua) (Posix).
 
-To start, (look at the demo)
+```lua
+-- dir is [string], if no dir is given, start on UserDirectory
+fs = lovefs(dir)
+```
 
-fs = lovefs(dir[string]) -- if no dir is given, start on UserDirectory
+To get started, have a look at the [demo](LoveFramesDemo.love).
 
----------------------------------------- lovefs.lua -------------------------------------------------
+## [lovefs.lua](lovefs/lovefs.lua)
 
-fs.current -- Current Directory [string] (don't change it, use fs:cd(dir))
+### members
 
-fs.drives, fs.dirs, fs.files, fs.all -- drives, directories and files [tables] of current dir
+```lua
+-- Current Directory [string] (don't change it, use fs:cd(dir))
+fs.current
 
-fs.selectedFile --  [string] used by fs:loadImage, fs:loadSource, fs:loadFont and fs:saveImage if no source is given
+-- drives, directories and files [tables] of current dir
+fs.drives
+fs.dirs
+fs.files
+fs.all
 
-fs.home -- user directory [string]
+--  [string] used by fs:loadImage, fs:loadSource, fs:loadFont and fs:saveImage if no source is given
+fs.selectedFile
 
-fs.filter -- [table] with extensions, like {'jpg', 'png'}. Used by fs:ls to filter files. Don't forget to NIL!
+-- user directory [string]
+fs.home
 
-fs.showHidden -- Show or hide hidden files and directories. Default: FALSE
+-- [table] with extensions, like {'jpg', 'png'}. Used by fs:ls to filter files. Don't forget to NIL!
+fs.filter
 
-function fs:updDrives() -- update drives list
+-- Show or hide hidden files and directories. Default: FALSE
+fs.showHidden
 
-The next functions accept absolute and relative (to current) paths
+```
 
-function fs:ls(dir) -- return dir (absolute path) [string], tDirs, tFiles, tAll [tables]. Return FALSE if dir don't exist. Alias: fs:dir(dir)
+### methods
 
-function fs:exists(path) -- return exists, isDirectory, isFile [booleans]
+```lua
+-- update drives list
+fs:updDrives() 
 
-function fs:isDirectory(path) -- return TRUE if is directory.
 
-function fs:isFile(path) return TRUE if is file. 
+--- These functions accept absolute and relative (to current) paths:
 
-function fs:cd(dir) -- Change directory. Populate fs.dirs and fs.files and fs.all with the new directory contents. Return TRUE if successful
 
-function fs:up() -- move to parent directory (using cd())
+-- return dir (absolute path) [string], tDirs, tFiles, tAll [tables]. Return FALSE if dir don't exist. Alias: fs:dir(dir)
+fs:ls(dir)
 
-function fs:setFilter(filter [nil, table or string]) -- sets fs.filter and calls fs:cd(). String can be 'File type | *.ext1 *.ext2'
+-- return TRUE if exists [booleans]
+fs:exists(path)
 
-function fs:switchHidden() -- switch fs.showHidden
+ -- return TRUE if is directory. [booleans]
+fs:isDirectory(path)
 
-function fs:absPath(path) -- return absolute paths
+ -- return TRUE if is file. [booleans]
+fs:isFile(path)
 
-function fs:loadImage(source) -- return image. Use fs.selectedFile if no source is given
+-- Change directory. Populate fs.dirs and fs.files and fs.all with the new directory contents. Return TRUE if successful
+fs:cd(dir)
 
-function fs:loadSource(source) --return sound. Use fs.selectedFile if no source is given
+-- move to parent directory (using cd())
+fs:up()
 
-function fs:loadFont(size, source) --return font. Use fs.selectedFile if no source is given
+-- filter can be [nil, table or string]. sets fs.filter and calls fs:cd().
+-- String can be 'File type | *.ext1 *.ext2'
+fs:setFilter(filter) 
 
-function fs:saveImage(img, dest) -- Need Canvas support. Return FALSE on failure. Use fs.selectedFile if no source is given
+-- switch fs.showHidden
+fs:switchHidden()
 
-This function only accept absolute paths
+-- return absolute paths
+fs:absPath(path)
 
-function fs:copy(source, dest) -- copy file
+ -- return image. Use fs.selectedFile if no source is given
+fs:loadImage(source)
 
----------------------------------------- gspotDialog.lua and loveframesDialog.lua and luigiDialog.lua ------------------------------------------------
+--return sound. Use fs.selectedFile if no source is given
+fs:loadSource(source) 
 
-fs:loadDialog(gui, label, filters) or fs:loadDialog(gui.Layout, label, filters) for Luigi
+--return font. Use fs.selectedFile if no source is given
+fs:loadFont(size, source) 
 
-fs:saveDialog(gui, label) or fs:saveDialog(gui.Layout, label) for Luigi
+-- Need Canvas support. Return FALSE on failure. Use fs.selectedFile if no source is given
+fs:saveImage(img, dest) 
 
-filters example: {'All | \*.\*', 'Image | *.jpg *.png *.bmp', 'Sound | *.mp3 *.wav'}
+-- copy file, this function only accept absolute paths
+fs:copy(source, dest) 
+```
 
-On close with OK, the path of the chosen file is at fs.selectedFile
 
+## dialogs
+
+These are ready-made dialogs for various UI libraries.
+
+Example filter:
+
+```lua
+{'All | \*.\*', 'Image | *.jpg *.png *.bmp', 'Sound | *.mp3 *.wav'}
+```
+
+When the user presses OK, the selected file is available in `fs.selectedFile`
+
+### [luigiDialog.lua](lovefs/luigiDialog.lua)
+
+Use this to make a file-browser dialog with [LUIGI](https://love2d.org/wiki/LUIGI). Also see [LuigiDemo](LuigiDemo).
+
+```lua
+-- show a load dialog, without a layout
+fs:loadDialog(gui, label, filters)
+
+-- use with a layout
+fs:loadDialog(gui.Layout, label, filters)
+
+
+-- show a save dialog, without a layout
+fs:saveDialog(gui, label)
+
+-- use with a layout
+fs:saveDialog(gui.Layout, label)
+```
+
+### [loveframesDialog.lua](lovefs/loveframesDialog.lua)
+
+Use this to make a file-browser dialog with [loveframes](https://github.com/linux-man/LoveFrames). Also see [LoveFramesDemo](LoveFramesDemo).
+
+
+```lua
+-- show a load dialog
+fs:loadDialog(lf, label, filters)
+
+-- show a save dialog
+fs:saveDialog(lf, label)
+```
+
+### [gspotDialog.lua](lovefs/gspotDialog.lua)
+
+Use this to make a file-browser dialog with [gspot](https://notabug.org/pgimeno/Gspot). Also see [GspotDemo](GspotDemo).
+
+```lua
+-- show a load dialog
+fs:loadDialog(gspot, label, filters)
+
+-- show a save dialog
+fs:saveDialog(gspot, label)
+```
