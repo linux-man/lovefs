@@ -1,8 +1,8 @@
 --[[------------------------------------
-LoveFS v1.1
+LoveFS v1.2
 Pure Lua FileSystem Access
 Under the MIT license.
-copyright(c) 2016 Caldas Lopes aka linux-man
+copyright(c) 2020 Caldas Lopes aka linux-man
 --]]------------------------------------
 
 local ffi = require("ffi")
@@ -34,18 +34,32 @@ ffi.cdef[[
 		const char* default, int* used);
 ]]
 
-ffi.cdef[[
-	struct dirent {
-		unsigned long  d_ino;       /* inode number */
-		unsigned long  d_off;       /* not an offset */
-		unsigned short d_reclen;    /* length of this record */
-		unsigned char  d_type;      /* type of file; not supported by all filesystem types */
-		char           d_name[256]; /* filename */
-	};
+if ffi.os == "OSX" then
+	ffi.cdef [[
+		struct dirent {
+			unsigned int d_fileno;     /* inode number */
+			unsigned short d_reclen;   /* length of this record */
+			char d_type;               /* type of file; not supported by all filesystem types */
+			char d_namlen;             /* length of filename */
+			char d_name[256]           /* filename */
+		};
+	]]
+else
+	ffi.cdef[[
+		struct dirent {
+			unsigned long  d_ino;       /* inode number */
+			unsigned long  d_off;       /* not an offset */
+			unsigned short d_reclen;    /* length of this record */
+			unsigned char  d_type;      /* type of file; not supported by all filesystem types */
+			char           d_name[256]; /* filename */
+		};
+	]]
+end
 
-	struct DIR *opendir(const char *name);
-	struct dirent *readdir(struct DIR *dirstream);
-	int closedir (struct DIR *dirstream);
+ffi.cdef[[
+		struct DIR *opendir(const char *name);
+		struct dirent *readdir(struct DIR *dirstream);
+		int closedir (struct DIR *dirstream);
 ]]
 
 local WIN32_FIND_DATA = ffi.typeof('struct WIN32_FIND_DATAW')
