@@ -320,6 +320,7 @@ end
 
 function filesystem:isFile(path)
 	local s = self:stat(path)
+	-- TODO: need to double-check this, I don't think it matches C header I found
 	return bit.band(s.mode, 170000) == 32768
 end
 
