@@ -156,4 +156,4 @@ fs:saveDialog(gspot, label)
 
 ## without ffi
 
-You can also use [lovefs-noffi](./lovefs-noffi), if you need suopport for pre-ffi love2d (before love 11), or you just want to not use FFI. It has it's own [README](lovefs-noffi/README.md). It uses `popen` to call commands on the host-system, so it's a bit slower, but maybe more cross-platform.
+You can also use [lovefs-noffi](./lovefs-noffi), if you need support for pre-ffi love2d (before love 11), or you just want to not use FFI. It has it's own [README](lovefs-noffi/README.md). It uses `popen` to call commands from the OS, so it's a bit slower, but maybe more cross-platform, in some situations.
