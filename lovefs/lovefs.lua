@@ -175,9 +175,9 @@ function filesystem:ls(dir)
 				elseif dirent.d_type == 8 then
 					table.insert(tFiles, fn)
 				elseif dirent.d_type == 10 then -- handle symlinks
-					local realPath,err = self:readlink(dir..fn)
+					local realPath, err = self:readlink(dir..fn)
 					if not err then
-						if self:isDirectory(dir .. realPath) then
+						if string.sub(realPath, -1) == '/' then
 							table.insert(tDirs, fn)
 						else
 							table.insert(tFiles, fn)
