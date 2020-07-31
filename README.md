@@ -49,11 +49,11 @@ fs.showHidden
 ```lua
 -- update drives list
 fs:updDrives() 
+```
 
+These functions accept absolute and relative (to current) paths:
 
---- These functions accept absolute and relative (to current) paths:
-
-
+```lua
 -- return dir (absolute path) [string], tDirs, tFiles, tAll [tables]. Return FALSE if dir don't exist. Alias: fs:dir(dir)
 fs:ls(dir)
 
