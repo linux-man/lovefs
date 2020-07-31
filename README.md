@@ -105,7 +105,7 @@ These are ready-made dialogs for various UI libraries.
 Example filter:
 
 ```lua
-{'All | \*.\*', 'Image | *.jpg *.png *.bmp', 'Sound | *.mp3 *.wav'}
+{'All | *.*', 'Image | *.jpg *.png *.bmp', 'Sound | *.mp3 *.wav'}
 ```
 
 When the user presses OK, the selected file is available in `fs.selectedFile`
