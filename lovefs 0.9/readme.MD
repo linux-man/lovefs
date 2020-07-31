@@ -1,4 +1,4 @@
-##This is an old, unmaintained version of loveFS, hosted here for historical and affective reasons. Only usefull if there is no "ffi" access.
+## This is an old, unmaintained version of loveFS, hosted here for historical and affective reasons. Only usefull if there is no "ffi" access.
 
 Reference:
 
