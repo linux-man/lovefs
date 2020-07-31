@@ -175,7 +175,7 @@ function filesystem:ls(dir)
 				elseif dirent.d_type == 8 then
 					table.insert(tFiles, fn)
 				elseif dirent.d_type == 10 then -- handle symlinks
-					if self:isDirectory(dir..fn) then
+					if self:isDirectory(dir..'/'..fn) then
 						table.insert(tDirs, fn)
 					else
 						table.insert(tFiles, fn)
@@ -315,15 +315,13 @@ function filesystem:exists(path)
 end
 
 function filesystem:isDirectory(path)
-	local s = self:stat(path)
-	-- TODO: need to double-check this, I don't think it matches https://opensource.apple.com/source/xnu/xnu-344/bsd/sys/stat.h.auto.html
-	return bit.band(s.mode, 70000) == 352
+	return not self:isFile(path)
 end
 
 function filesystem:isFile(path)
-	local s = self:stat(path)
+	local s, err = self:stat(path)
 	-- TODO: need to double-check this, I don't think it matches https://opensource.apple.com/source/xnu/xnu-344/bsd/sys/stat.h.auto.html
-	return bit.band(s.mode, 70000) == 288
+	return bit.band(s.mode, 170000) == 32768
 end
 
 function filesystem:updDrives()
