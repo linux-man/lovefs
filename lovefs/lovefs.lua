@@ -34,6 +34,7 @@ ffi.cdef[[
 		const char* default, int* used);
 ]]
 
+-- TODO: this also applies to other BSDs
 if ffi.os == "OSX" then
 	ffi.cdef [[
 		struct dirent {
@@ -173,6 +174,15 @@ function filesystem:ls(dir)
 					table.insert(tDirs, fn)
 				elseif dirent.d_type == 8 then
 					table.insert(tFiles, fn)
+				elseif dirent.d_type == 10 then -- handle symlinks
+					local realPath,err = self:readlink(dir..fn)
+					if not err then
+						if self:isDirectory(dir .. realPath) then
+							table.insert(tDirs, fn)
+						else
+							table.insert(tFiles, fn)
+						end
+					end
 				end
 				dirent = ffi.C.readdir(hDir)
 			end
@@ -203,6 +213,28 @@ end
 function filesystem:dir(dir)
 	return self:ls(dir)
 end
+
+if OS == 'Windows' then
+    function filesystem:readlink()
+        return nil, "could not obtain link target: Function not implemented "
+    end
+else
+    ffi.cdef('ssize_t readlink(const char *path, char *buf, size_t bufsize);')
+    function filesystem:readlink(link_path, statbuf)
+        local size = 512
+        local buf = ffi.new('char[?]', size + 1)
+        local read = ffi.C.readlink(link_path, buf, size)
+        if read == -1 then
+            return nil, "could not obtain link target"
+        end
+        if read > size then
+            return nil, "not enought size for readlink:"
+        end
+        buf[size] = 0
+        return ffi.string(buf)
+    end
+end
+
 
 function filesystem:cd(dir)
 	current, tDirs, tFiles, tAll = self:ls(dir)
@@ -336,8 +368,13 @@ function lovefs(dir)
 	temp.win = ffi.os == "Windows"
 	temp.selectedFile = nil
 	temp.filter = nil
-	temp.showHidden = false 
-	temp.home = love.filesystem.getUserDirectory()
+	temp.showHidden = false
+	-- luajit support
+	if love then
+		temp.home = love.filesystem.getUserDirectory()
+	else
+		temp.home = os.getenv("HOME")
+	end
 	temp.current = temp.home
 	temp.sep = package.config:sub(1,1)
 	dir = dir or temp.home
