@@ -225,10 +225,10 @@ else
         local buf = ffi.new('char[?]', size + 1)
         local read = ffi.C.readlink(link_path, buf, size)
         if read == -1 then
-            return nil, "could not obtain link target"
+            return nil, "could not obtain link target."
         end
         if read > size then
-            return nil, "not enought size for readlink:"
+            return nil, "not enough buffer-size for readlink."
         end
         buf[size] = 0
         return ffi.string(buf)
