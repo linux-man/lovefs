@@ -315,13 +315,15 @@ function filesystem:exists(path)
 end
 
 function filesystem:isDirectory(path)
-	return not self:isFile(path)
+	local s = self:stat(path)
+	-- TODO: need to double-check this, I don't think it matches https://opensource.apple.com/source/xnu/xnu-344/bsd/sys/stat.h.auto.html
+	return bit.band(s.mode, 70000) == 352
 end
 
 function filesystem:isFile(path)
 	local s = self:stat(path)
-	-- TODO: need to double-check this, I don't think it matches C header I found
-	return bit.band(s.mode, 170000) == 32768
+	-- TODO: need to double-check this, I don't think it matches https://opensource.apple.com/source/xnu/xnu-344/bsd/sys/stat.h.auto.html
+	return bit.band(s.mode, 70000) == 288
 end
 
 function filesystem:updDrives()
