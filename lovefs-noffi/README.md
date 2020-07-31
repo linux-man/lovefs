@@ -97,7 +97,7 @@ fs:run(command)
 
 ### [dialogs.lua](dialogs.lua)
 
-Load and Save Dialog using LoveFrames (modified.)
+Load and Save Dialog using [loveframes](https://github.com/linux-man/LoveFrames) (modified.)
 
 ```lua
 -- create a load-dialog
