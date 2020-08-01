@@ -315,13 +315,13 @@ function filesystem:exists(path)
 end
 
 function filesystem:isDirectory(path)
-	return not self:isFile(path)
+	local s, err = self:stat(path)
+	-- TODO: should be ((s.mode & 0170000) == 0040000) but that gives wrong answer.
+	return bit.band(s.mode, 170000) == 0
 end
 
 function filesystem:isFile(path)
-	local s, err = self:stat(path)
-	-- TODO: need to double-check this, I don't think it matches https://opensource.apple.com/source/xnu/xnu-344/bsd/sys/stat.h.auto.html
-	return bit.band(s.mode, 170000) == 32768
+	return not self:isDirectory(path)
 end
 
 function filesystem:updDrives()
