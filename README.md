@@ -97,6 +97,25 @@ fs:saveImage(img, dest)
 fs:copy(source, dest) 
 ```
 
+On Linux & OSX, you have a few more:
+
+```lua
+-- get low-level file-stat
+fs:stat(path)
+
+-- get the location a sym-link points to
+fs:readlink(path)
+
+-- is the file/directory a sym-link?
+fs:isLink(path)
+
+-- is the file/directory a special character device?
+fs:isChar(path)
+
+-- is the file/directory as[ecoal block device?
+fs:isBlock(path)
+```
+
 
 ## dialogs
 
