@@ -337,8 +337,6 @@ function filesystem:up()
 	self:cd(self.current:match('(.*'..self.sep..')'))
 end
 
--- TODO: fix these to use stat, instead
-
 function filesystem:exists(path)
 	path = self:absPath(path)
 	dir = self:absPath(path:match('(.*'..self.sep..')'))
