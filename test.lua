@@ -13,3 +13,5 @@ end
 for i,v in pairs(tFiles) do
     print(v)
 end
+
+print("/testlinkfile: ", fs:readlink("/testlinkfile"))

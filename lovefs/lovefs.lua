@@ -211,7 +211,7 @@ function filesystem:dir(dir)
 	return self:ls(dir)
 end
 
-if OS == 'Windows' then
+if ffi.os == 'Windows' then
     function filesystem:readlink()
         return nil, "could not obtain link target: Function not implemented "
 	end
@@ -229,27 +229,6 @@ if OS == 'Windows' then
 	end
 else
 	ffi.cdef [[
-		struct stat{
-			unsigned long   st_dev;
-			unsigned long   st_ino;
-			unsigned long   st_nlink;
-			unsigned int    st_mode;
-			unsigned int    st_uid;
-			unsigned int    st_gid;
-			unsigned int    __pad0;
-			unsigned long   st_rdev;
-			long            st_size;
-			long            st_blksize;
-			long            st_blocks;
-			unsigned long   st_atime;
-			unsigned long   st_atime_nsec;
-			unsigned long   st_mtime;
-			unsigned long   st_mtime_nsec;
-			unsigned long   st_ctime;
-			unsigned long   st_ctime_nsec;
-			long            __unused[3];
-		};
-		long syscall(int number, ...);
 		ssize_t readlink(const char *path, char *buf, size_t bufsize);
 	]]
 	
@@ -267,31 +246,59 @@ else
         buf[size] = 0
         return ffi.string(buf)
 	end
-	
-	function filesystem:stat(file)
-		file = file or self.current
-		local buf = ffi.new('struct stat')
-		if ffi.C.syscall(4, file, buf) == -1 then
-			return nil, "Could not stat file"
-		else
-			return {
-				dev = buf.st_dev,
-				ino = buf.st_ino,
-				nlink = buf.st_nlink,
-				mode = buf.st_mode,
-				uid = buf.st_uid,
-				gid = buf.st_gid,
-				rdev = buf.st_rdev,
-				size = buf.st_size,
-				blksize = buf.st_blksize,
-				blocks = buf.st_blocks,
-				atime = buf.st_atime,
-				atime_nsec = buf.st_atime_nsec,
-				mtime = buf.st_mtime,
-				mtime_nsec = buf.st_mtime_nsec,
-				ctime = buf.st_ctime,
-				ctime_nsec = buf.st_ctime_nsec
-			}
+
+	-- TODO: implement stat for OSX, maybe syscall 188: https://opensource.apple.com/source/xnu/xnu-1504.3.12/bsd/kern/syscalls.master
+
+	if ffi.os == 'Linux' then
+		ffi.cdef [[
+			struct stat{
+				unsigned long   st_dev;
+				unsigned long   st_ino;
+				unsigned long   st_nlink;
+				unsigned int    st_mode;
+				unsigned int    st_uid;
+				unsigned int    st_gid;
+				unsigned int    __pad0;
+				unsigned long   st_rdev;
+				long            st_size;
+				long            st_blksize;
+				long            st_blocks;
+				unsigned long   st_atime;
+				unsigned long   st_atime_nsec;
+				unsigned long   st_mtime;
+				unsigned long   st_mtime_nsec;
+				unsigned long   st_ctime;
+				unsigned long   st_ctime_nsec;
+				long            __unused[3];
+			};
+			long syscall(int number, ...);
+		]]
+		
+		function filesystem:stat(file)
+			file = file or self.current
+			local buf = ffi.new('struct stat')
+			if ffi.C.syscall(4, file, buf) == -1 then
+				return nil, "Could not stat file"
+			else
+				return {
+					dev = buf.st_dev,
+					ino = buf.st_ino,
+					nlink = buf.st_nlink,
+					mode = buf.st_mode,
+					uid = buf.st_uid,
+					gid = buf.st_gid,
+					rdev = buf.st_rdev,
+					size = buf.st_size,
+					blksize = buf.st_blksize,
+					blocks = buf.st_blocks,
+					atime = buf.st_atime,
+					atime_nsec = buf.st_atime_nsec,
+					mtime = buf.st_mtime,
+					mtime_nsec = buf.st_mtime_nsec,
+					ctime = buf.st_ctime,
+					ctime_nsec = buf.st_ctime_nsec
+				}
+			end
 		end
 	end
 
