@@ -42,7 +42,7 @@ if ffi.os == "OSX" then
 			unsigned short d_reclen;   /* length of this record */
 			char d_type;               /* type of file; not supported by all filesystem types */
 			char d_namlen;             /* length of filename */
-			char d_name[256]           /* filename */
+			char d_name[256];           /* filename */
 		};
 	]]
 else
