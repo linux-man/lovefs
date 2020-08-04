@@ -229,7 +229,7 @@ if ffi.os == 'Windows' then
 	end
 else
 	ffi.cdef [[
-		ssize_t readlink(const char *path, char *buf, size_t bufsize);
+		size_t readlink(const char *path, char *buf, size_t bufsize);
 	]]
 	
 	function filesystem:readlink(link_path)
