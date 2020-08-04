@@ -300,6 +300,73 @@ else
 				}
 			end
 		end
+	elseif ffi.os == 'OSX' then
+		ffi.cdef [[
+			typedef uint16_t mode_t;
+			typedef uint32_t dev_t;
+			typedef uint16_t nlink_t;
+			typedef uint64_t ino64_t;
+			typedef uint32_t uid_t;
+			typedef uint32_t gid_t;
+			typedef int64_t off_t;
+			typedef int64_t blkcnt_t;
+			typedef int32_t blksize_t;
+
+			uid_t           st_uid;
+  		gid_t           st_gid;
+  		typedef long time_t;
+
+  		struct timespec {
+			  time_t tv_sec;
+			  long   tv_nsec;
+			};
+
+			struct stat {
+			  dev_t           st_dev;
+			  mode_t          st_mode;
+			  nlink_t         st_nlink;
+			  ino64_t         st_ino;
+			  uid_t           st_uid;
+			  gid_t           st_gid;
+			  dev_t           st_rdev;
+			  struct timespec st_atimespec;
+			  struct timespec st_mtimespec;
+			  struct timespec st_ctimespec;
+			  struct timespec st_birthtimespec;
+			  off_t           st_size;
+			  blkcnt_t        st_blocks;
+			  blksize_t       st_blksize;
+			  uint32_t        st_flags;
+			  uint32_t        st_gen;
+			  int32_t         st_lspare;
+			  int64_t         st_qspare[2];
+			};
+			int stat(const char* path, struct stat* buf);
+		]]
+		function filesystem:stat(file)
+			file = file or self.current
+			print(file)
+			local buf = ffi.new('struct stat')
+			if ffi.C.stat(file, buf) == -1 then
+				return nil, "Could not stat file"
+			else
+				print(buf.st_mode)
+				return {
+					dev = buf.st_dev,
+					ino = buf.st_ino,
+					nlink = buf.st_nlink,
+					mode = buf.st_mode,
+					uid = buf.st_uid,
+					gid = buf.st_gid,
+					rdev = buf.st_rdev,
+					size = buf.st_size,
+					blksize = buf.st_blksize,
+					blocks = buf.st_blocks,
+					flags = buf.st_flags,
+					gen = buf.st_gen
+				}
+			end
+		end
 	end
 
 	function filesystem:isDirectory(path)
