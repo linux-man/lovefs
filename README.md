@@ -154,6 +154,10 @@ fs:loadDialog(gspot, label, filters)
 fs:saveDialog(gspot, label)
 ```
 
+### slab
+
+[Slab](https://github.com/coding-jackalope/Slab) has some nice UI elements built-in, that use this library, as well.
+
 ## without ffi
 
 You can also use [lovefs-noffi](./lovefs-noffi), if you need support for pre-ffi love2d (before love 11), or you just want to not use FFI. It has it's own [README](lovefs-noffi/README.md). It uses `popen` to call commands from the OS, so it's a bit slower, but maybe more cross-platform, in some situations.
