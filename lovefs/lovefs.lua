@@ -156,7 +156,7 @@ function filesystem:ls(dir)
 				local fn = w2u(fd.cFileName)
 				if fd.dwFileWttributes == 16 or fd.dwFileWttributes == 17 or (self.showHidden and fd.dwFileWttributes == 8210) then
 					table.insert(tDirs, fn)
-				elseif fd.dwFileWttributes == 32 then
+				elseif fd.dwFileWttributes == 32 or fd.dwFileWttributes == 0x2020 then
 					table.insert(tFiles, fn)
 				end
 			until not ffi.C.FindNextFileW(hFile, fd)
