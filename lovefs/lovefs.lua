@@ -154,9 +154,9 @@ function filesystem:ls(dir)
 		if hFile ~= INVALID_HANDLE then
 			repeat
 				local fn = w2u(fd.cFileName)
-				if fd.dwFileWttributes == 16 or fd.dwFileWttributes == 17 or (self.showHidden and fd.dwFileWttributes == 8210) then
+				if fd.dwFileWttributes == 0x10 or fd.dwFileWttributes == 0x11 or (self.showHidden and fd.dwFileWttributes == 0x2012) then
 					table.insert(tDirs, fn)
-				elseif fd.dwFileWttributes == 32 or fd.dwFileWttributes == 0x2020 then
+				elseif fd.dwFileWttributes == 0x20 or fd.dwFileWttributes == 0x2020 then
 					table.insert(tFiles, fn)
 				end
 			until not ffi.C.FindNextFileW(hFile, fd)
