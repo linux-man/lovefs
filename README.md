@@ -9,6 +9,9 @@ The ffi code was mostly adapted (with my sincerest gratitude) from
 * [fi-luajit](https://github.com/nyfair/fi-luajit) (Windows)
 * [pflua](https://github.com/Igalia/pflua) (Posix).
 
+`attr` function was adapted from 
+* [luafilesystem-ffi](https://github.com/3scale/luafilesystem-ffi/blob/master/lfs_ffi.lua)
+
 ```lua
 -- dir is [string], if no dir is given, start on UserDirectory
 fs = lovefs(dir)
@@ -56,13 +59,13 @@ These functions accept absolute and relative (to current) paths:
 -- return dir (absolute path) [string], tDirs, tFiles, tAll [tables]. Return FALSE if dir don't exist. Alias: fs:dir(dir)
 fs:ls(dir)
 
--- return TRUE if exists [booleans]
+-- return TRUE if exists [boolean]
 fs:exists(path)
 
- -- return TRUE if is directory. [booleans]
+ -- return TRUE if is directory. [boolean]
 fs:isDirectory(path)
 
- -- return TRUE if is file. [booleans]
+ -- return TRUE if is file. [boolean]
 fs:isFile(path)
 
 -- Change directory. Populate fs.dirs and fs.files and fs.all with the new directory contents. Return TRUE if successful
@@ -88,13 +91,23 @@ fs:loadImage(source)
 fs:loadSource(source) 
 
 --return font. Use fs.selectedFile if no source is given
-fs:loadFont(size, source) 
+fs:loadFont(size, source)
 
 -- Need Canvas support. Return FALSE on failure. Use fs.selectedFile if no source is given
-fs:saveImage(img, dest) 
+fs:saveImage(img, dest)
 
 -- copy file, this function only accept absolute paths
-fs:copy(source, dest) 
+fs:copy(source, dest)
+
+-- return a table of file attributes
+fs:attr(path)
+
+-- return a file attribute value
+fs:attr(path, attr)
+
+-- (POSIX systems: follow_Symlink[boolean])
+fs:attr(path, [attr or nil], follow_symlink)
+
 ```
 
 
@@ -112,7 +125,7 @@ When the user presses OK, the selected file is available in `fs.selectedFile`
 
 ### [luigiDialog.lua](lovefs/luigiDialog.lua)
 
-Use this to make a file-browser dialog with [LUIGI](https://love2d.org/wiki/LUIGI). Also see [LuigiDemo](LuigiDemo).
+Use this to make a file-browser dialog with [LUIGI](https://love2d.org/wiki/LUIGI).
 
 ```lua
 -- show a load dialog, without a layout
@@ -131,8 +144,7 @@ fs:saveDialog(gui.Layout, label)
 
 ### [loveframesDialog.lua](lovefs/loveframesDialog.lua)
 
-Use this to make a file-browser dialog with [loveframes](https://github.com/linux-man/LoveFrames). Also see [LoveFramesDemo](LoveFramesDemo).
-
+Use this to make a file-browser dialog with [loveframes](https://github.com/linux-man/LoveFrames).
 
 ```lua
 -- show a load dialog
@@ -144,7 +156,7 @@ fs:saveDialog(lf, label)
 
 ### [gspotDialog.lua](lovefs/gspotDialog.lua)
 
-Use this to make a file-browser dialog with [gspot](https://notabug.org/pgimeno/Gspot). Also see [GspotDemo](GspotDemo).
+Use this to make a file-browser dialog with [gspot](https://notabug.org/pgimeno/Gspot).
 
 ```lua
 -- show a load dialog
