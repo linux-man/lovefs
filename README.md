@@ -180,7 +180,7 @@ for key, value in pairs(fs.all) do
 	for _, a in pairs(t) do
 		print('\t', _, a)
 	end
-	print('\t', 'Human readable time')
+	print('\t', 'Human readable timestamp')
 	print('\t', 'modification', os.date(_, tostring(t['modification'], 'atime')))
 	print('\t', 'access', os.date(_, tostring(t['access'], 'atime')))
 	print('\t', 'change', os.date(_, tostring(t['change'], 'atime')))
@@ -194,7 +194,7 @@ t = fs:attr(fs:absPath(value), nil, true)
 	for _, a in pairs(t) do
 		print('\t', _, a)
 	end
-	print('\t', 'Human readable time')
+	print('\t', 'Human readable timestamp')
 	print('\t', 'modification', os.date(_, tostring(t['modification'], 'atime')))
 	print('\t', 'access', os.date(_, tostring(t['access'], 'atime')))
 	print('\t', 'change', os.date(_, tostring(t['change'], 'atime')))
