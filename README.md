@@ -222,4 +222,4 @@ attribs = {
 ```
 ## without ffi
 
-You can also use [lovefs-noffi](./lovefs-noffi), if you need support for pre-ffi love2d (before love 11), or you just want to not use FFI. It has it's own [README](lovefs-noffi/README.md). It uses `popen` to call commands from the OS, so it's a bit slower, but maybe more cross-platform, in some situations.
+You can also use [lovefs-noffi](./lovefs-noffi), if you need support for pre-ffi love2d (before love 11), or you just don't want to use FFI. It has it's own [README](lovefs-noffi/README.md). It uses `popen` to call commands from the OS, so it's a bit slower, but maybe more cross-platform, in some situations.
