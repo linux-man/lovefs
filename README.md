@@ -16,9 +16,6 @@ The ffi code was mostly adapted (with my sincerest gratitude) from
 -- dir is [string], if no dir is given, start on UserDirectory
 fs = lovefs(dir)
 ```
-
-To get started, have a look at the [demo](LoveFramesDemo.love).
-
 ## [lovefs.lua](lovefs/lovefs.lua)
 
 ### members
@@ -31,6 +28,7 @@ fs.current
 fs.drives
 fs.dirs
 fs.files
+fs.others (POSIX links and devices)
 fs.all
 
 --  [string] used by fs:loadImage, fs:loadSource, fs:loadFont and fs:saveImage if no source is given
@@ -56,7 +54,7 @@ fs:updDrives()
 These functions accept absolute and relative (to current) paths:
 
 ```lua
--- return dir (absolute path) [string], tDirs, tFiles, tAll [tables]. Return FALSE if dir don't exist. Alias: fs:dir(dir)
+-- return dir (absolute path) [string], tDirs, tFiles, tOthers, tAll [tables]. Return FALSE if dir don't exist. Alias: fs:dir(dir)
 fs:ls(dir)
 
 -- return TRUE if exists [boolean]
@@ -107,7 +105,6 @@ fs:attr(path, attr)
 
 -- (POSIX systems: follow_Symlink[boolean])
 fs:attr(path, [attr or nil], follow_symlink)
-
 ```
 
 
@@ -170,6 +167,59 @@ fs:saveDialog(gspot, label)
 
 [Slab](https://github.com/coding-jackalope/Slab) has some nice UI elements built-in, that use this library, as well.
 
+### attr example
+```lua
+require('lovefs')
+fs = lovefs()
+fs:ls()
+
+print('Current Dir:', fs.current)
+for key, value in pairs(fs.all) do
+	print(key, value)
+	t = fs:attr(fs:absPath(value))
+	for _, a in pairs(t) do
+		print('\t', _, a)
+	end
+	print('\t', 'Human readable time')
+	print('\t', 'modification', os.date(_, tostring(t['modification'], 'atime')))
+	print('\t', 'access', os.date(_, tostring(t['access'], 'atime')))
+	print('\t', 'change', os.date(_, tostring(t['change'], 'atime')))
+end
+
+-- POSIX Symlinks
+print('Following links')
+for key, value in pairs(fs.others) do
+	print(key, value)
+t = fs:attr(fs:absPath(value), nil, true)
+	for _, a in pairs(t) do
+		print('\t', _, a)
+	end
+	print('\t', 'Human readable time')
+	print('\t', 'modification', os.date(_, tostring(t['modification'], 'atime')))
+	print('\t', 'access', os.date(_, tostring(t['access'], 'atime')))
+	print('\t', 'change', os.date(_, tostring(t['change'], 'atime')))
+end
+
+--[[
+attribs = {
+"access",
+"blksize",
+"blocks",
+"change",
+"dev",
+"gid",
+"ino",
+"mode",
+"modification",
+"nlink",
+"permissions",
+"rdev",
+"size",
+"uid"}
+
+"target" for symlinks
+]]--
+```
 ## without ffi
 
 You can also use [lovefs-noffi](./lovefs-noffi), if you need support for pre-ffi love2d (before love 11), or you just want to not use FFI. It has it's own [README](lovefs-noffi/README.md). It uses `popen` to call commands from the OS, so it's a bit slower, but maybe more cross-platform, in some situations.
